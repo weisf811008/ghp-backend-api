@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/方案項目/">
+    <File Path=".gitignore" />
+  </Folder>
+  <Project Path="GhpAPI/GhpAPI.csproj" />
+</Solution>
