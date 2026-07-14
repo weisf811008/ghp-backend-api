@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace GhpAPI.DTOs
 {
     /// <summary>巡檢執行人</summary>
@@ -87,12 +89,16 @@ namespace GhpAPI.DTOs
     public class SaveInspectionFileDto
     {
         /// <summary>儲存的檔案名稱</summary>
+        [Required(ErrorMessage = "檔案名稱為必填")]
         public string Filename { get; set; } = null!;
         /// <summary>原始檔案名稱</summary>
+        [Required(ErrorMessage = "原始檔案名稱為必填")]
         public string Originalname { get; set; } = null!;
         /// <summary>編碼方式</summary>
+        [Required(ErrorMessage = "編碼方式為必填")]
         public string Encoding { get; set; } = null!;
         /// <summary>檔案類型</summary>
+        [Required(ErrorMessage = "檔案類型為必填")]
         public string Mimetype { get; set; } = null!;
     }
 
@@ -100,8 +106,10 @@ namespace GhpAPI.DTOs
     public class SaveInspectionDetailDto
     {
         /// <summary>細項 ID</summary>
+        [Required(ErrorMessage = "細項為必填")]
         public int ItemId { get; set; }
         /// <summary>檢查狀態（pass/fail/others）</summary>
+        [Required(ErrorMessage = "檢查狀態為必填")]
         public string Status { get; set; } = null!;
         /// <summary>備註</summary>
         public string? Remarks { get; set; }
@@ -115,12 +123,14 @@ namespace GhpAPI.DTOs
     public class SaveInspectionDto
     {
         /// <summary>巡檢日期</summary>
+        [Required(ErrorMessage = "巡檢日期為必填")]
         public DateTime Date { get; set; }
         /// <summary>改善期限</summary>
         public DateTime? DueDate { get; set; }
         /// <summary>備註</summary>
         public string? Remarks { get; set; }
         /// <summary>表單 ID</summary>
+        [Required(ErrorMessage = "表單為必填")]
         public int FormId { get; set; }
         /// <summary>細項結果列表</summary>
         public List<SaveInspectionDetailDto> Details { get; set; } = new List<SaveInspectionDetailDto>();

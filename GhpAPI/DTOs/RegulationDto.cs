@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace GhpAPI.DTOs
 {
     /// <summary>GHP 條文資料</summary>
@@ -25,10 +27,13 @@ namespace GhpAPI.DTOs
     public class SaveRegulationDto
     {
         /// <summary>條文編號</summary>
+        [Required(ErrorMessage = "條文編號為必填")]
         public string Code { get; set; } = null!;
         /// <summary>條文類別</summary>
+        [Required(ErrorMessage = "條文類別為必填")]
         public string Class { get; set; } = null!;
         /// <summary>條文內容</summary>
+        [Required(ErrorMessage = "條文內容為必填")]
         public string Description { get; set; } = null!;
     }
 }

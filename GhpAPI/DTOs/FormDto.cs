@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace GhpAPI.DTOs
 {
     /// <summary>表單資料</summary>
@@ -25,6 +27,7 @@ namespace GhpAPI.DTOs
     public class SaveFormDto
     {
         /// <summary>表單標題</summary>
+        [Required(ErrorMessage = "表單標題為必填")]
         public string Title { get; set; } = null!;
         /// <summary>備註</summary>
         public string? Remarks { get; set; }

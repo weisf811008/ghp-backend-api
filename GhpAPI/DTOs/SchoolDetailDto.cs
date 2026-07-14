@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace GhpAPI.DTOs
 {
     /// <summary>學校詳細資料</summary>
@@ -29,8 +31,10 @@ namespace GhpAPI.DTOs
     public class CreateSchoolDto
     {
         /// <summary>學校代碼</summary>
+        [Required(ErrorMessage = "學校代碼為必填")]
         public string Code { get; set; } = null!;
         /// <summary>學校名稱</summary>
+        [Required(ErrorMessage = "學校名稱為必填")]
         public string Name { get; set; } = null!;
         /// <summary>所在縣市</summary>
         public string? City { get; set; }
@@ -46,6 +50,7 @@ namespace GhpAPI.DTOs
     public class UpdateSchoolDto
     {
         /// <summary>學校名稱</summary>
+        [Required(ErrorMessage = "學校名稱為必填")]
         public string? Name { get; set; }
         /// <summary>所在縣市</summary>
         public string? City { get; set; }

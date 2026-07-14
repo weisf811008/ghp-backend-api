@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace GhpAPI.DTOs
 {
     /// <summary>訪視表條文資料</summary>
@@ -23,10 +25,13 @@ namespace GhpAPI.DTOs
     public class SaveVisitingFormDto
     {
         /// <summary>訪視表編號</summary>
+        [Required(ErrorMessage = "訪視表編號為必填")]
         public string Code { get; set; } = null!;
         /// <summary>訪視表類別</summary>
+        [Required(ErrorMessage = "訪視表類別為必填")]
         public string Class { get; set; } = null!;
         /// <summary>訪視表內容</summary>
+        [Required(ErrorMessage = "訪視表內容為必填")]
         public string Description { get; set; } = null!;
     }
 }

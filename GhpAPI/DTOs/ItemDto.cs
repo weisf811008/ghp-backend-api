@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace GhpAPI.DTOs
 {
     /// <summary>細項資料</summary>
@@ -35,8 +37,10 @@ namespace GhpAPI.DTOs
     public class SaveItemDto
     {
         /// <summary>細項編號</summary>
+        [Required(ErrorMessage = "細項編號為必填")]
         public string No { get; set; } = null!;
         /// <summary>細項名稱</summary>
+        [Required(ErrorMessage = "細項名稱為必填")]
         public string Item { get; set; } = null!;
         /// <summary>檢查週期</summary>
         public string? Period { get; set; }
@@ -47,6 +51,7 @@ namespace GhpAPI.DTOs
         /// <summary>是否需要每日檢查</summary>
         public bool NeedDaily { get; set; } = false;
         /// <summary>大項 ID</summary>
+        [Required(ErrorMessage = "大項為必填")]
         public int CategoryId { get; set; }
         /// <summary>關聯的 GHP 條文編號列表</summary>
         public List<string> Regulations { get; set; } = new List<string>();

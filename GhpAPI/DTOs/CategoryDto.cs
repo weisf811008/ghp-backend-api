@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace GhpAPI.DTOs
 {
     /// <summary>大項資料</summary>
@@ -19,6 +21,7 @@ namespace GhpAPI.DTOs
     public class SaveCategoryDto
     {
         /// <summary>大項名稱</summary>
+        [Required(ErrorMessage = "大項名稱為必填")]
         public string Category { get; set; } = null!;
     }
 }

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace GhpAPI.DTOs
 {
     /// <summary>系統管理員查看的使用者資料</summary>
@@ -35,8 +37,10 @@ namespace GhpAPI.DTOs
     public class CreateAdminUserDto
     {
         /// <summary>帳號</summary>
+        [Required(ErrorMessage = "帳號為必填")]
         public string Username { get; set; } = null!;
         /// <summary>密碼</summary>
+        [Required(ErrorMessage = "密碼為必填")]
         public string Password { get; set; } = null!;
         /// <summary>電子郵件</summary>
         public string? Email { get; set; }
@@ -45,6 +49,7 @@ namespace GhpAPI.DTOs
         /// <summary>電話</summary>
         public string? Phone { get; set; }
         /// <summary>學校 ID</summary>
+        [Required(ErrorMessage = "學校為必填")]
         public int SchoolId { get; set; }
         /// <summary>角色列表（例如：學校管理員、巡檢人員）</summary>
         public List<string> Roles { get; set; } = new List<string>();
@@ -60,6 +65,7 @@ namespace GhpAPI.DTOs
         /// <summary>電話</summary>
         public string? Phone { get; set; }
         /// <summary>學校 ID</summary>
+        [Required(ErrorMessage = "學校為必填")]
         public int SchoolId { get; set; }
         /// <summary>角色列表</summary>
         public List<string> Roles { get; set; } = new List<string>();
@@ -69,6 +75,7 @@ namespace GhpAPI.DTOs
     public class ResetPasswordDto
     {
         /// <summary>新密碼</summary>
+        [Required(ErrorMessage = "新密碼為必填")]
         public string NewPassword { get; set; } = null!;
     }
 }
