@@ -9,6 +9,17 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// CORS 設定
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")  // Vite 預設 port
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Controllers
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options =>
@@ -140,6 +151,8 @@ if (!Directory.Exists(uploadDir))
 {
     Directory.CreateDirectory(uploadDir);
 }
+
+app.UseCors("AllowFrontend");
 
 app.UseStaticFiles(new StaticFileOptions
 {
