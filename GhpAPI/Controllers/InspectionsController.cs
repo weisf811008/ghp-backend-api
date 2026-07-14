@@ -14,10 +14,13 @@ namespace GhpAPI.Controllers
     [Authorize]
     public class InspectionsController : BaseController
     {
-        public InspectionsController(AppDbContext db, HistoryService historyService)
+        private readonly IWebHostEnvironment _env;
+        public InspectionsController(AppDbContext db, HistoryService historyService, IWebHostEnvironment env)
         : base(db, historyService)
         {
+            _env = env;
         }
+
 
         //GET api/inspections
         [HttpGet]
@@ -227,7 +230,7 @@ namespace GhpAPI.Controllers
                 return BadRequest(new { message = "請選擇檔案" });
             }
 
-            var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "uploads", "insp", "files");
+            var uploadDir = Path.Combine(_env.ContentRootPath, "uploads", "insp", "files");
 
             if (!Directory.Exists(uploadDir))
             {
