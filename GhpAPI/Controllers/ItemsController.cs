@@ -11,7 +11,7 @@ namespace GhpAPI.Controllers
     [Route("api/items")]
     [ApiController]
     [Tags("細項管理")]
-    [Authorize]
+   
 
     public class ItemsController : BaseController
     {

@@ -11,7 +11,7 @@ namespace GhpAPI.Controllers
     [Route("api/regulations")]
     [ApiController]
     [Tags("條文管理")]
-    [Authorize]
+   
     public class RegulationsController : BaseController
     {
         public RegulationsController(AppDbContext db, HistoryService historyService)

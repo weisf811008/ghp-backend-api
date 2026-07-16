@@ -11,7 +11,7 @@ namespace GhpAPI.Controllers
     [Route("api/visitingForms")]
     [ApiController]
     [Tags("訪視表管理")]
-    [Authorize]
+   
     public class VisitingFormController : BaseController
     {
         public VisitingFormController(AppDbContext db, HistoryService historyService)

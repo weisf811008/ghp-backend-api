@@ -21,6 +21,7 @@ namespace GhpAPI.Controllers
 
         //POST api/auth/login
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             var user = await _authService.ValidateUser(dto.Username, dto.Password);
@@ -61,7 +62,6 @@ namespace GhpAPI.Controllers
 
         //POST api/auth/me
         [HttpGet("me")]
-        [Authorize]
 
         public IActionResult Me()
         {

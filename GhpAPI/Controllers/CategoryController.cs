@@ -11,7 +11,6 @@ namespace GhpAPI.Controllers
     [Route("api/categories")]
     [ApiController]
     [Tags("大項管理")]
-    [Authorize]
     public class CategoryController : BaseController
     {
         public CategoryController(AppDbContext db, HistoryService historyService)

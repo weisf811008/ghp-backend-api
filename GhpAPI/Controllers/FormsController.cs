@@ -10,7 +10,7 @@ namespace GhpAPI.Controllers
 {
     [Route("api/forms")]
     [ApiController]
-    [Authorize]
+   
     [Tags("表單管理")]
 
     public class FormsController : BaseController

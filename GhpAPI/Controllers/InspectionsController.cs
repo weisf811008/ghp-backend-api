@@ -11,7 +11,7 @@ namespace GhpAPI.Controllers
     [Route("api/inspections")]
     [ApiController]
     [Tags("巡檢紀錄")]
-    [Authorize]
+   
     public class InspectionsController : BaseController
     {
         private readonly IWebHostEnvironment _env;
