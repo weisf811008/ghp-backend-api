@@ -38,6 +38,7 @@ namespace GhpAPI.DTOs
     {
         /// <summary>細項編號</summary>
         [Required(ErrorMessage = "細項編號為必填")]
+        [MaxLength(10, ErrorMessage = "不可超過 10 字元")]
         public string No { get; set; } = null!;
         /// <summary>細項名稱</summary>
         [Required(ErrorMessage = "細項名稱為必填")]

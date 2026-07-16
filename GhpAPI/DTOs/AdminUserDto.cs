@@ -40,13 +40,16 @@ namespace GhpAPI.DTOs
         [Required(ErrorMessage = "帳號為必填")]
         public string Username { get; set; } = null!;
         /// <summary>密碼</summary>
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "密碼長度需在 6-100 字元之間")]
         [Required(ErrorMessage = "密碼為必填")]
         public string Password { get; set; } = null!;
         /// <summary>電子郵件</summary>
+        [EmailAddress(ErrorMessage = "Email 格式不正確")]
         public string? Email { get; set; }
         /// <summary>姓名</summary>
         public string? Name { get; set; }
         /// <summary>電話</summary>
+        [Phone(ErrorMessage = "電話格式不正確")]
         public string? Phone { get; set; }
         /// <summary>學校 ID</summary>
         [Required(ErrorMessage = "學校為必填")]
@@ -75,6 +78,7 @@ namespace GhpAPI.DTOs
     public class ResetPasswordDto
     {
         /// <summary>新密碼</summary>
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "密碼長度需在 6-100 字元之間")]
         [Required(ErrorMessage = "新密碼為必填")]
         public string NewPassword { get; set; } = null!;
     }

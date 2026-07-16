@@ -41,8 +41,10 @@ namespace GhpAPI.DTOs
         /// <summary>地址</summary>
         public string? Address { get; set; }
         /// <summary>電話</summary>
+        [Phone(ErrorMessage = "電話格式不正確")]
         public string? Phone { get; set; }
         /// <summary>網址</summary>
+        [Url(ErrorMessage = "網址格式不正確")]
         public string? Url { get; set; }
     }
 
