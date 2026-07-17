@@ -11,7 +11,7 @@ namespace GhpAPI.Controllers
     [Route("api/inspections")]
     [ApiController]
     [Tags("巡檢紀錄")]
-   
+
     public class InspectionsController : BaseController
     {
         private readonly IWebHostEnvironment _env;
@@ -261,6 +261,43 @@ namespace GhpAPI.Controllers
                 encoding = "7bit",
                 mimetype = file.ContentType,
             });
+        }
+
+        //GET api/inspections/files/{filename}
+        [HttpGet("files/{filename}")]
+
+        public IActionResult GetFile(string filename)
+        {
+            var uploadDir = Path.Combine(_env.ContentRootPath, "uploads", "insp", "files");
+            var filePath = Path.Combine(uploadDir, filename);
+
+            var fullPath = Path.GetFullPath(filePath);
+            if (!fullPath.StartsWith(Path.GetFullPath(uploadDir)))
+            {
+                return BadRequest(new { message = "無效的檔案路徑" });
+            }
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound(new { message = "檔案不存在" });
+            }
+
+            var mimeType = GetMimeType(filename);
+            return PhysicalFile(filePath, mimeType);
+        }
+
+        private string GetMimeType(string filename)
+        {
+            var ext = Path.GetExtension(filename).ToLowerInvariant();
+            return ext switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".pdf" => "application/pdf",
+                ".doc" => "application/msword",
+                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                _ => "application/octet-stream"
+            };
         }
     }
 }

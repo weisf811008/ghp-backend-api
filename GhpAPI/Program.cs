@@ -158,12 +158,6 @@ if (!Directory.Exists(uploadDir))
 
 app.UseCors("AllowFrontend");
 
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadDir),
-    RequestPath = "/api/inspections/files"
-});
-
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
