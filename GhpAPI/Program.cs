@@ -1,6 +1,7 @@
 using GhpAPI.Data;
 using GhpAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -44,6 +45,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<HistoryService>();
+builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<RegulationService>();
+builder.Services.AddScoped<VisitingFormService>();
+builder.Services.AddScoped<ItemService>();
+builder.Services.AddScoped<FormService>();
+builder.Services.AddScoped<InspectionService>();
+builder.Services.AddScoped<ReportService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<AdminUserService>();
+builder.Services.AddScoped<SchoolService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -131,6 +142,8 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+app.UseCors("AllowFrontend");
+
 // Swagger（開發環境）
 if (app.Environment.IsDevelopment())
 {
@@ -156,7 +169,6 @@ if (!Directory.Exists(uploadDir))
     Directory.CreateDirectory(uploadDir);
 }
 
-app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 

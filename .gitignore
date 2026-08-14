@@ -17,3 +17,5 @@ uploads/
 
 # Environment
 appsettings.Development.json
+
+*.zip

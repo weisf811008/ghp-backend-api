@@ -1,10 +1,8 @@
 ﻿using GhpAPI.Data;
 using GhpAPI.DTOs;
-using GhpAPI.Entities;
 using GhpAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace GhpAPI.Controllers
 {
@@ -14,9 +12,11 @@ namespace GhpAPI.Controllers
    
     public class RegulationsController : BaseController
     {
-        public RegulationsController(AppDbContext db, HistoryService historyService)
+        private readonly RegulationService _regulationService;
+        public RegulationsController(AppDbContext db, HistoryService historyService, RegulationService regulationService)
          : base(db, historyService)
         {
+            _regulationService = regulationService;
         }
 
         //GET api/regulations
@@ -25,19 +25,7 @@ namespace GhpAPI.Controllers
 
         public async Task<IActionResult> GetAll()
         {
-            var schoolId = GetSchoolId();
-            var regulations = await _db.Regulations
-                .Where(r => r.SchoolId == schoolId && r.DeletedAt == null)
-                .Select(r => new RegulationDto
-                {
-                    Id = r.Id,
-                    Code = r.Code,
-                    Class = r.Class,
-                    Description = r.Description,
-                    CreatedAt = r.CreatedAt,
-                    UpdatedAt = r.UpdatedAt,
-                    DeletedAt = r.DeletedAt
-                }).ToListAsync();
+            var regulations = await _regulationService.GetAll(GetSchoolId());
             return Ok(regulations);
         }
 
@@ -46,24 +34,13 @@ namespace GhpAPI.Controllers
         [Authorize(Roles = "學校管理員,巡檢人員")]
         public async Task<IActionResult> GetById(int id)
         {
-            var schoolId = GetSchoolId();
-            var regulation = await _db.Regulations
-                .Where(r => r.Id == id && r.SchoolId == schoolId && r.DeletedAt == null)
-                .Select(r => new RegulationDto
-                {
-                    Id = r.Id,
-                    Code = r.Code,
-                    Class = r.Class,
-                    Description = r.Description,
-                    CreatedAt = r.CreatedAt,
-                    UpdatedAt = r.UpdatedAt,
-                    DeletedAt = r.DeletedAt
-                }).FirstOrDefaultAsync();
-            if (regulation == null)
+            var result = await _regulationService.GetById(id, GetSchoolId());
+
+            if (result == null)
             {
                 return NotFound(new { message = "條文不存在" });
             }
-            return Ok(regulation);
+            return Ok(result);
         }
 
 
@@ -73,31 +50,14 @@ namespace GhpAPI.Controllers
 
         public async Task<IActionResult> Create([FromBody] SaveRegulationDto dto)
         {
-            var schoolId = GetSchoolId();
-            var exist = await _db.Regulations.AnyAsync(r => r.Code == dto.Code && r.SchoolId == schoolId && r.DeletedAt == null);
-            if (exist)
-            {
-                return BadRequest(new { message = "條文已存在" });
-            }
-            var regulation = new Regulation
-            {
-                Code = dto.Code,
-                Class = dto.Class,
-                Description = dto.Description,
-                SchoolId = schoolId,
-            };
-            _db.Regulations.Add(regulation);
-            await _db.SaveChangesAsync();
-            await _historyService.Info(
-                "新增條文",
-                username: GetUsername(),
-                name: GetName(),
-                schoolId: schoolId,
-                controller: nameof(RegulationsController),
-                instanceKey: regulation.Id.ToString()
-            );
+            var (success, error, id) = await _regulationService.Create(dto, GetSchoolId(), GetUsername(), GetName());
 
-            return CreatedAtAction(nameof(GetById), new { id = regulation.Id }, new { id = regulation.Id });
+            if (!success)
+            {
+                return Conflict(new { message = error });
+            }
+
+            return CreatedAtAction(nameof(GetById), new { id }, new { id });
         }
 
         //PUT api/regulations/{id}
@@ -106,29 +66,18 @@ namespace GhpAPI.Controllers
 
         public async Task<IActionResult> Update(int id, [FromBody] SaveRegulationDto dto)
         {
-            var schoolId = GetSchoolId();
+            var (success, error) = await _regulationService.Update(id, dto, GetSchoolId(), GetUsername(), GetName());
 
-            var regulation = await _db.Regulations.FirstOrDefaultAsync(r => r.Id == id && r.SchoolId == schoolId && r.DeletedAt == null);
-
-            if (regulation == null)
+            if (!success)
             {
-                return NotFound(new { message = "條文不存在" });
+                if (error == "條文不存在")
+                {
+                    return NotFound(new { message = error });
+                }
+
+                return Conflict(new { message = error });
             }
 
-            regulation.Code = dto.Code;
-            regulation.Class = dto.Class;
-            regulation.Description = dto.Description;
-            regulation.UpdatedAt = DateTime.UtcNow;
-
-            await _db.SaveChangesAsync();
-            await _historyService.Info(
-                "修改條文",
-                username: GetUsername(),
-                name: GetName(),
-                schoolId: schoolId,
-                controller: nameof(RegulationsController),
-                instanceKey: regulation.Id.ToString()
-            );
             return NoContent();
         }
 
@@ -137,24 +86,12 @@ namespace GhpAPI.Controllers
         [Authorize(Roles = "學校管理員")]
 
         public async Task<IActionResult> Delete(int id)
-        { 
-            var schoolId = GetSchoolId();
-            var regulation = await _db.Regulations.FirstOrDefaultAsync(r => r.Id == id && r.SchoolId == schoolId && r.DeletedAt == null);
-            if (regulation == null)
-            { 
-                return NotFound(new { message = "條文不存在" });
+        {
+            var (success, error) = await _regulationService.Delete(id, GetSchoolId(), GetUsername(), GetName());
+            if (!success)
+            {
+                return NotFound(new { message = error });
             }
-
-            regulation.DeletedAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync();
-            await _historyService.Info(
-                "刪除條文",
-                username: GetUsername(),
-                name: GetName(),
-                schoolId: schoolId,
-                controller: nameof(RegulationsController),
-                instanceKey: regulation.Id.ToString()
-            );
             return NoContent();
         }
     }

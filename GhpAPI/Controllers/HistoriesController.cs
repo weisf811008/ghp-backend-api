@@ -1,8 +1,7 @@
 ﻿using GhpAPI.Data;
-using GhpAPI.DTOs;
+using GhpAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace GhpAPI.Controllers
 {
@@ -10,12 +9,11 @@ namespace GhpAPI.Controllers
     [ApiController]
     [Tags("操作紀錄")]
     [Authorize(Roles = "學校管理員")]
-    public class HistoriesController : ControllerBase
+    public class HistoriesController : BaseController
     {
-        private readonly AppDbContext _db;
-
-        public HistoriesController(AppDbContext db) {
-            _db = db;
+        public HistoriesController(AppDbContext db, HistoryService historyService)
+            : base(db, historyService)
+        {
         }
 
         private int GetSchoolId()
@@ -26,32 +24,12 @@ namespace GhpAPI.Controllers
         //GET api/histories
         [HttpGet]
         public async Task<IActionResult> GetAll(DateTime? start, DateTime? end)
-        { 
-            var schoolId = GetSchoolId();
-
+        {
             var endDate = end ?? DateTime.Now;
             var startDate = start ?? endDate.AddDays(-7);
 
-            var histories = await _db.Histories
-                .Where(h => h.SchoolId == schoolId && h.Timestamp >= startDate && h.Timestamp <=endDate)
-                .OrderByDescending(h => h.Timestamp)
-                .Take(500)
-                .Select(h => new HistoryDto
-                {
-                    Id = h.Id,
-                    Timestamp = h.Timestamp,
-                    Level = h.Level,
-                    Message = h.Message,
-                    Type = h.Type,
-                    Controller = h.Controller,
-                    InstanceKey = h.InstanceKey,
-                    Username = h.Username,
-                    Name = h.Name,
-                    SchoolId = h.SchoolId,
-                }).ToListAsync();
-
-            return Ok(histories);
+            var result = await _historyService.GetAll(GetSchoolId(), startDate, endDate);
+            return Ok(result);
         }
-            
     }
 }

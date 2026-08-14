@@ -1,6 +1,7 @@
 ﻿using GhpAPI.Data;
+using GhpAPI.DTOs;
 using GhpAPI.Entities;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GhpAPI.Services
 {
@@ -11,6 +12,30 @@ namespace GhpAPI.Services
         public HistoryService(AppDbContext db)
         {
             _db = db;
+        }
+
+        public async Task<List<HistoryDto>> GetAll(int schoolId, DateTime startDate, DateTime endDate)
+        {
+            return await _db.Histories
+                .Where(h => h.SchoolId == schoolId
+                    && h.Timestamp >= startDate
+                    && h.Timestamp <= endDate)
+                .OrderByDescending(h => h.Timestamp)
+                .Take(500)
+                .Select(h => new HistoryDto
+                {
+                    Id = h.Id,
+                    Timestamp = h.Timestamp,
+                    Level = h.Level,
+                    Message = h.Message,
+                    Type = h.Type,
+                    Controller = h.Controller,
+                    InstanceKey = h.InstanceKey,
+                    Username = h.Username,
+                    Name = h.Name,
+                    SchoolId = h.SchoolId,
+                })
+                .ToListAsync();
         }
 
         public async Task Log(string level, string message, string? username = null, string? name = null, int? schoolId = null, string? type = null, string? controller = null, string? instanceKey = null)

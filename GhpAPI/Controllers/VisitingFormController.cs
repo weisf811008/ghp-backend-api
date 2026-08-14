@@ -14,9 +14,11 @@ namespace GhpAPI.Controllers
    
     public class VisitingFormController : BaseController
     {
-        public VisitingFormController(AppDbContext db, HistoryService historyService)
+        private readonly VisitingFormService _visitingFormService;
+        public VisitingFormController(AppDbContext db, HistoryService historyService, VisitingFormService visitingFormService)
         : base(db, historyService)
         {
+            _visitingFormService = visitingFormService;
         }
 
         //GET api/visitingForms
@@ -25,20 +27,7 @@ namespace GhpAPI.Controllers
 
         public async Task<IActionResult> GetAll()
         {
-            var schoolId = GetSchoolId();
-
-            var visitingForms = await _db.VisitingForms
-                .Where(v => v.SchoolId == schoolId && v.DeletedAt == null)
-                .Select(v => new VisitingFormDto
-                {
-                    Id = v.Id,
-                    Code = v.Code,
-                    Class = v.Class,
-                    Description = v.Description,
-                    CreatedAt = v.CreatedAt,
-                    UpdatedAt = v.UpdatedAt,
-                    DeletedAt = v.DeletedAt,
-                }).ToListAsync();
+            var visitingForms = await _visitingFormService.GetAll(GetSchoolId());
 
             return Ok(visitingForms);
         }
@@ -49,27 +38,15 @@ namespace GhpAPI.Controllers
 
         public async Task<IActionResult> GetById(int id)
         {
-            var schoolId = GetSchoolId();
+           
+            var result = await _visitingFormService.GetById(id, GetSchoolId());
 
-            var visitingForm = await _db.VisitingForms
-                .Where(v => v.Id == id && v.SchoolId == schoolId && v.DeletedAt == null)
-                .Select(v => new VisitingFormDto
-                {
-                    Id = v.Id,
-                    Code = v.Code,
-                    Class = v.Class,
-                    Description= v.Description,
-                    CreatedAt = v.CreatedAt,
-                    UpdatedAt = v.UpdatedAt,
-                    DeletedAt = v.DeletedAt,
-                }).FirstOrDefaultAsync();
-
-            if (visitingForm == null)
+            if (result == null)
             {
                 return NotFound(new { message = "訪視表不存在" });
             }
 
-            return Ok(visitingForm);
+            return Ok(result);
         }
 
         //POST api/visitingForms
@@ -78,34 +55,15 @@ namespace GhpAPI.Controllers
 
         public async Task<IActionResult> Create([FromBody] SaveVisitingFormDto dto)
         {
-            var schoolId = GetSchoolId();
 
-            var exist = await _db.VisitingForms.AnyAsync(v => v.Code == dto.Code && v.SchoolId == schoolId && v.DeletedAt == null);
+            var (success, error, id) = await _visitingFormService.Create(dto, GetSchoolId(), GetUsername(), GetName());
 
-            if (exist)
+            if (!success)
             {
-                return Conflict(new { message = "訪視表已存在" });
+                return Conflict(new { message = error });
             }
 
-            var visitingForm = new VisitingForm
-            {
-                Code = dto.Code,
-                Class = dto.Class,
-                Description = dto.Description,
-                SchoolId = schoolId,
-            };
-            _db.VisitingForms.Add(visitingForm);
-            await _db.SaveChangesAsync();
-            await _historyService.Info(
-                "新增訪視表",
-                username: GetUsername(),
-                name: GetName(),
-                schoolId: schoolId,
-                controller: nameof(VisitingFormController),
-                instanceKey: visitingForm.Id.ToString()
-            );
-            return CreatedAtAction(nameof(GetById), new { id = visitingForm.Id }, new { id = visitingForm.Id });
-
+            return CreatedAtAction(nameof(GetById), new { id }, new { id });
         }
 
         //PUT api/visitingForms/{id}
@@ -114,29 +72,16 @@ namespace GhpAPI.Controllers
 
         public async Task<IActionResult> Update(int id, [FromBody] SaveVisitingFormDto dto)
         {
-            var schoolId = GetSchoolId();
-
-            var visitingForm = await _db.VisitingForms.FirstOrDefaultAsync(v => v.Id == id && v.SchoolId == schoolId && v.DeletedAt == null);
-
-            if (visitingForm == null)
+            var (success, error) = await _visitingFormService.Update(id, dto, GetSchoolId(), GetUsername(), GetName());
+            if (!success)
             {
-                return NotFound(new { message = "訪視表不存在" });
+                if (error == "訪視表不存在")
+                {
+                    return NotFound(new { message = error });
+                }
+
+                return Conflict(new { message = error });
             }
-
-            visitingForm.Code = dto.Code;
-            visitingForm.Class = dto.Class;
-            visitingForm.Description = dto.Description;
-            visitingForm.UpdatedAt = DateTime.UtcNow;
-
-            await _db.SaveChangesAsync();
-            await _historyService.Info(
-                "修改訪視表",
-                username: GetUsername(),
-                name: GetName(),
-                schoolId: schoolId,
-                controller: nameof(VisitingFormController),
-                instanceKey: visitingForm.Id.ToString()
-            );
             return NoContent();
         }
 
@@ -146,23 +91,12 @@ namespace GhpAPI.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var schoolId = GetSchoolId();
-            var visitingForm = await _db.VisitingForms.FirstOrDefaultAsync(v => v.Id == id && v.SchoolId == schoolId && v.DeletedAt == null);
-            if (visitingForm == null)
-            {
-                return NotFound(new { message = "訪視表不存在" });
-            }
+            var (success, error) = await _visitingFormService.Delete(id, GetSchoolId(), GetUsername(), GetName());
 
-            visitingForm.DeletedAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync();
-            await _historyService.Info(
-                "刪除訪視表",
-                username: GetUsername(),
-                name: GetName(),
-                schoolId: schoolId,
-                controller: nameof(VisitingFormController),
-                instanceKey: visitingForm.Id.ToString()
-            );
+            if (!success)
+            {
+                return NotFound(new { message = error });
+            }
             return NoContent();
     }
 }
